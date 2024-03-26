@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open-feature-demo-env-flag-config
+  namespace: open-feature-demo
+data:
+  NEW_WELCOME_MESSAGE: "false"
+  FIB_ALGO: "recursive"
+  HEX_COLOR: "00CC00"

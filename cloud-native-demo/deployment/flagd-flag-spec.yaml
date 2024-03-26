@@ -1,0 +1,78 @@
+apiVersion: core.openfeature.dev/v1beta1
+kind: FeatureFlagSource
+metadata:
+    name: end-to-end
+    namespace: open-feature-demo
+spec:
+    evaluator: json
+    defaultSyncProvider: kubernetes
+    debugLogging: true
+    otelCollectorUri: "open-feature-demo-otel-collector-service.open-feature-demo.svc.cluster.local:4317"
+    sources:
+    - source: open-feature-demo/server-side
+      provider: kubernetes
+    - source: open-feature-demo/client-side
+      provider: kubernetes
+    probesEnabled: true
+---
+apiVersion: core.openfeature.dev/v1beta1
+kind: FeatureFlag
+metadata:
+  name: client-side
+  namespace: open-feature-demo
+spec:
+  flagSpec:
+    flags:
+      new-welcome-message:
+        state: ENABLED
+        variants:
+          'on': true
+          'off': false
+        defaultVariant: 'off'
+      hex-color:
+        variants:
+          red: c05543
+          green: 2f5230
+          blue: 0d507b
+          yellow: d4ac0d
+        defaultVariant: blue
+        state: ENABLED
+        targeting:
+          if:
+            - in:
+                - "@faas.com"
+                - var:
+                    - email
+            - yellow
+            - null
+---
+apiVersion: core.openfeature.dev/v1beta1
+kind: FeatureFlag
+metadata:
+  name: server-side
+  namespace: open-feature-demo
+spec:
+  flagSpec:
+    flags:
+      fib-algo:
+        variants:
+          recursive: recursive
+          memo: memo
+          loop: loop
+          binet: binet
+        defaultVariant: recursive
+        state: ENABLED
+        targeting:
+          if:
+            - in:
+                - "@faas.com"
+                - var:
+                    - email
+            - binet
+            - null
+      use-remote-fib-service:
+        state: ENABLED
+        variants:
+          'on': true
+          'off': false
+        defaultVariant: 'on'

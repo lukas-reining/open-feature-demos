@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: open-feature-kubecon
+  namespace: argocd
+spec:
+  destination:
+    namespace: open-feature-kubecon
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: kubecon-24-demo/deployment
+    repoURL: {{GITOPS_REPO}}
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

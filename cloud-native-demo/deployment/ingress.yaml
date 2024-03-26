@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: playground-ingress
+  namespace: open-feature-demo
+  annotations:
+    cert-manager.io/cluster-issuer: reining-dev-prod-issuer
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: of-cloud-native.reining.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: open-feature-demo-service
+                port:
+                  number: 80
+          - path: /jaeger
+            pathType: Prefix
+            backend:
+              service:
+                name: open-feature-demo-jaeger-ui
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - of-cloud-native.reining.dev
+      secretName: of-demo-server-tls

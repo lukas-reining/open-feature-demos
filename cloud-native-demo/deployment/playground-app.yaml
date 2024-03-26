@@ -1,0 +1,174 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: open-feature-demo-playground-app
+  namespace: open-feature-demo
+  labels:
+    app: open-feature-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: open-feature-demo
+  template:
+    metadata:
+      labels:
+        app: open-feature-demo
+      annotations:
+        openfeature.dev/enabled: "true"
+        openfeature.dev/featureflagsource: "end-to-end"
+    spec:
+      volumes:
+        - name: proxy-config
+          configMap:
+            name: proxy-config
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+      containers:
+        - name: flagd-proxy
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: proxy-config
+              mountPath: /etc/nginx
+              readOnly: true
+        - name: open-feature-demo
+          image: ghcr.io/open-feature/playground-app:v0.14.0
+          args:
+            - flagd
+          ports:
+            - containerPort: 30000
+          envFrom:
+            - configMapRef:
+                name: open-feature-demo-config
+            - configMapRef:
+                name: open-feature-demo-env-flag-config
+          env:
+            - name: FLAGD_HOST_WEB
+              value: "of-cloud-native.reining.dev"
+            - name: FLAGD_TLS_WEB
+              value: "true"
+            - name: FLAGD_PORT_WEB
+              value: "443"
+            - name: HARNESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vendor-keys
+                  key: harness-key
+                  optional: true
+            - name: HARNESS_KEY_WEB
+              valueFrom:
+                secretKeyRef:
+                  name: vendor-keys
+                  key: harness-key-web
+                  optional: true
+            - name: LD_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vendor-keys
+                  key: ld-key
+                  optional: true
+            - name: LD_KEY_WEB
+              valueFrom:
+                secretKeyRef:
+                  name: vendor-keys
+                  key: ld-key-web
+                  optional: true
+            - name: SPLIT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vendor-keys
+                  key: split-key
+                  optional: true
+            - name: SPLIT_KEY_WEB
+              valueFrom:
+                secretKeyRef:
+                  name: vendor-keys
+                  key: split-key-web
+                  optional: true
+            - name: CLOUDBEES_APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vendor-keys
+                  key: cloudbees-key
+                  optional: true
+            - name: CLOUDBEES_APP_KEY_WEB
+              valueFrom:
+                secretKeyRef:
+                  name: vendor-keys
+                  key: cloudbees-key-web
+                  optional: true
+            - name: FLAGSMITH_ENV_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vendor-keys
+                  key: flagsmith-key
+                  optional: true
+            - name: FLAGSMITH_ENV_KEY_WEB
+              valueFrom:
+                secretKeyRef:
+                  name: vendor-keys
+                  key: flagsmith-key-web
+                  optional: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: open-feature-demo-service
+  namespace: open-feature-demo
+spec:
+  type: ClusterIP
+  selector:
+    app: open-feature-demo
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flagd-service
+  namespace: open-feature-demo
+spec:
+  type: ClusterIP
+  selector:
+    app: open-feature-demo
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open-feature-demo-config
+  namespace: open-feature-demo
+data:
+  OTEL_COLLECTOR_URL: "http://open-feature-demo-otel-collector-service.open-feature-demo.svc.cluster.local:4317"
+  GO_FEATURE_FLAG_URL: "http://open-feature-demo-goff-service.open-feature-demo.svc.cluster.local:1031"
+  FIB_SERVICE_URL: "http://open-feature-fibonacci-service.open-feature-demo.svc.cluster.local:30000"
+  NODE_ENV: "production"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: proxy-config
+  namespace: open-feature-demo
+data:
+  nginx.conf: |
+    events {}
+    http {
+      server {
+        location / {
+          proxy_pass http://127.0.0.1:30000;
+
+          # kill cache
+          expires -1;
+        }
+        location /schema.v1.Service {
+          proxy_pass http://127.0.0.1:8013;
+          grpc_pass grpc://localhost:8013;
+        }
+      }
+    }
