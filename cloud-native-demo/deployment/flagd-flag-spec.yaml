@@ -75,4 +75,12 @@ spec:
         variants:
           'on': true
           'off': false
-        defaultVariant: 'on'
+        defaultVariant: 'off'
+        targeting:
+          if:
+            - in:
+                - "@faas.com"
+                - var:
+                    - email
+            - "on"
+            - "off"
