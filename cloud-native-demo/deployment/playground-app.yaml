@@ -148,6 +148,7 @@ data:
   OTEL_COLLECTOR_URL: "http://open-feature-demo-otel-collector-service.open-feature-demo.svc.cluster.local:4317"
   GO_FEATURE_FLAG_URL: "http://open-feature-demo-goff-service.open-feature-demo.svc.cluster.local:1031"
   FIB_SERVICE_URL: "http://open-feature-fibonacci-service.open-feature-demo.svc.cluster.local:30000"
+  OTEL_LOG_LEVEL: "DEBUG"
   NODE_ENV: "production"
 ---
 apiVersion: v1
