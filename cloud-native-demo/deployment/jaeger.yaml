@@ -1,0 +1,26 @@
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  namespace: open-feature-demo
+  name: jaeger
+spec:
+  strategy: allinone
+  allInOne:
+    options:
+      log-level: debug
+      query:
+        base-path: "/"
+  ingress:
+    enabled: true
+    pathType: Prefix
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: reining-dev-prod-issuer
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+      kubernetes.io/ingress.class: nginx
+    hosts:
+      - jaeger.of-cloud-native.reining.dev
+    tls:
+      - hosts:
+          - jaeger.of-cloud-native.reining.dev
+        secretName: of-demo-jaeger-server-tls

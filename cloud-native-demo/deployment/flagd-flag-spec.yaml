@@ -7,7 +7,7 @@ spec:
     evaluator: json
     defaultSyncProvider: kubernetes
     debugLogging: true
-    otelCollectorUri: "open-feature-demo-otel-collector-service.open-feature-demo.svc.cluster.local:4317"
+    otelCollectorUri: "open-feature-demo-otel-collector.open-feature-demo.svc.cluster.local:4317"
     sources:
     - source: open-feature-demo/server-side
       provider: kubernetes
@@ -60,7 +60,7 @@ spec:
           memo: memo
           loop: loop
           binet: binet
-        defaultVariant: recursive
+        defaultVariant: binet
         state: ENABLED
         targeting:
           if:
@@ -76,11 +76,3 @@ spec:
           'on': true
           'off': false
         defaultVariant: 'off'
-        targeting:
-          if:
-            - in:
-                - "@faas.com"
-                - var:
-                    - email
-            - "on"
-            - "off"

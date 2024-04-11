@@ -19,13 +19,6 @@ spec:
                 name: open-feature-demo-service
                 port:
                   number: 80
-          - path: /jaeger
-            pathType: Prefix
-            backend:
-              service:
-                name: open-feature-demo-jaeger-ui
-                port:
-                  number: 80
   tls:
     - hosts:
         - of-cloud-native.reining.dev
