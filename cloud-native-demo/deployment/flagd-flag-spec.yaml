@@ -60,7 +60,7 @@ spec:
           memo: memo
           loop: loop
           binet: binet
-        defaultVariant: binet
+        defaultVariant: recursive
         state: ENABLED
         targeting:
           if:
@@ -76,3 +76,11 @@ spec:
           'on': true
           'off': false
         defaultVariant: 'off'
+        targeting:
+          if:
+            - in:
+                - "@faas.com"
+                - var:
+                    - email
+            - "off"
+            - "off"
