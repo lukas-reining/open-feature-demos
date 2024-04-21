@@ -76,11 +76,11 @@ spec:
           'on': true
           'off': false
         defaultVariant: 'off'
-        # targeting:
-        #   if:
-        #     - in:
-        #         - "@faas.com"
-        #         - var:
-        #             - email
-        #     - "on"
-        #     - "off"
+        targeting:
+          if:
+            - in:
+                - "@faas.com"
+                - var:
+                    - email
+            - "on"
+            - "off"

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: open-feature-demo-go-feature-flag-proxy
+  name: open-feature-demo-go-feature-flag
   namespace: open-feature-demo
 spec:
   replicas: 1
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: open-feature-demo-goff
-          image: thomaspoignant/go-feature-flag-relay-proxy:v0.3.0
+          image: thomaspoignant/go-feature-flag:v1.26
           ports:
             - containerPort: 1031
           volumeMounts:
@@ -80,11 +80,19 @@ data:
       false: 2f5230
       default: c05543
       percentage: 100
+    # Controls whether the remote fib service is used
+    #  - true
+    #  - false
+    use-remote-fib-service:
+      true: true
+      false: false
+      default: true
+      percentage: 100
     # Must be a valid algorithm name
     #  - recurive
     #  - memo
     #  - loop
-    #  - binet
+    #  - binet    
     fib-algo:
       true: binet
       false: recursive

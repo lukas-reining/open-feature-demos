@@ -18,24 +18,9 @@ spec:
         openfeature.dev/enabled: "true"
         openfeature.dev/featureflagsource: "end-to-end"
     spec:
-      volumes:
-        - name: proxy-config
-          configMap:
-            name: proxy-config
-            items:
-              - key: nginx.conf
-                path: nginx.conf
       containers:
-        - name: flagd-proxy
-          image: nginx:stable-alpine
-          ports:
-            - containerPort: 80
-          volumeMounts:
-            - name: proxy-config
-              mountPath: /etc/nginx
-              readOnly: true
         - name: open-feature-demo
-          image: ghcr.io/open-feature/playground-app:v0.14.0
+          image: ghcr.io/open-feature/playground-app:v0.15.2
           args:
             - flagd
           ports:
@@ -46,12 +31,6 @@ spec:
             - configMapRef:
                 name: open-feature-demo-env-flag-config
           env:
-            - name: FLAGD_HOST_WEB
-              value: "of-cloud-native.reining.dev"
-            - name: FLAGD_TLS_WEB
-              value: "true"
-            - name: FLAGD_PORT_WEB
-              value: "443"
             - name: HARNESS_KEY
               valueFrom:
                 secretKeyRef:
@@ -114,6 +93,27 @@ spec:
                   optional: true
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open-feature-demo-config
+  namespace: open-feature-demo
+data:
+  OTEL_COLLECTOR_URL: "http://open-feature-demo-otel-collector.open-feature-demo.svc.cluster.local:4317"
+  FIB_SERVICE_URL: "http://open-feature-fibonacci-service.open-feature-demo.svc.cluster.local:30000"
+  FLAGD_HOST: "localhost"
+  FLAGD_PORT: "8013"
+  FLAGD_TLS: "false"
+  FLAGD_HOST_WEB: "flagd.of-cloud-native.reining.dev"
+  FLAGD_TLS_WEB: "true"
+  FLAGD_PORT_WEB: "443"
+  FLAGD_OFREP_TLS_WEB: "true"
+  FLAGD_OFREP_PORT_WEB: "443"
+  GO_FEATURE_FLAG_URL: "http://open-feature-demo-goff-service.open-feature-demo.svc.cluster.local:1031"
+  GO_FEATURE_FLAG_WEB_URL: "https://goff.of-cloud-native.reining.dev"
+  NODE_ENV: "production"
+  # OTEL_LOG_LEVEL: "DEBUG"
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: open-feature-demo-service
@@ -124,12 +124,13 @@ spec:
     app: open-feature-demo
   ports:
     - port: 80
-      targetPort: 80
+      protocol: TCP
+      targetPort: 30000
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: flagd-service
+  name: flagd-ofrep-service
   namespace: open-feature-demo
 spec:
   type: ClusterIP
@@ -137,39 +138,19 @@ spec:
     app: open-feature-demo
   ports:
     - port: 80
-      targetPort: 80
+      protocol: TCP
+      targetPort: 8016
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: Service
 metadata:
-  name: open-feature-demo-config
+  name: flagd-grpc-service
   namespace: open-feature-demo
-data:
-  OTEL_COLLECTOR_URL: "http://open-feature-demo-otel-collector.open-feature-demo.svc.cluster.local:4317"
-  GO_FEATURE_FLAG_URL: "http://open-feature-demo-goff-service.open-feature-demo.svc.cluster.local:1031"
-  FIB_SERVICE_URL: "http://open-feature-fibonacci-service.open-feature-demo.svc.cluster.local:30000"
-  OTEL_LOG_LEVEL: "DEBUG"
-  NODE_ENV: "production"
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: proxy-config
-  namespace: open-feature-demo
-data:
-  nginx.conf: |
-    events {}
-    http {
-      server {
-        location / {
-          proxy_pass http://127.0.0.1:30000;
-
-          # kill cache
-          expires -1;
-        }
-        location /schema.v1.Service {
-          proxy_pass http://127.0.0.1:8013;
-          grpc_pass grpc://localhost:8013;
-        }
-      }
-    }
+spec:
+  type: ClusterIP
+  selector:
+    app: open-feature-demo
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8013
