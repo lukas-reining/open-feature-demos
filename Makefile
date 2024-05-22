@@ -11,3 +11,6 @@ create-cloud-native-demo:
 	sed 's~{{GITOPS_REPO}}~$(GITOPS_REPO)~g' cloud-native-demo/app.yaml > cloud-native-demo/app_tmp.yaml
 	kubectl -n argocd apply -f cloud-native-demo/app_tmp.yaml
 	rm cloud-native-demo/app_tmp.yaml
+
+update-flags:
+	 kubectl apply -n open-feature-kubecon -f kubecon-24-demo/deployment/flags.yaml --validate=false
