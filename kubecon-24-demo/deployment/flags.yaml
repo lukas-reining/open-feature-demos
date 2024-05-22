@@ -203,7 +203,7 @@ spec:
           green: 0a0
           blue: 00a
           indigo: 4b0082
-        #targeting: *emptyTargeting
+        targeting: *emptyTargeting
         #targeting: *pixelTargeting
         #targeting: *batteryTargeting
         #targeting: *giveawayTargeting
