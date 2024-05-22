@@ -94,9 +94,9 @@ pixelTargeting: &pixelTargeting
 giveawayTargeting: &giveawayTargeting
   fractional:
     - - red
-      - 75
+      - 90
     - - green
-      - 25
+      - 10
 
 ## target color based on device battery (low=red, medium=yellow, high=green, null=grey)
 batteryTargeting: &batteryTargeting
@@ -251,9 +251,9 @@ spec:
           globe: 🌎
           clock: ⏰
           boom: 💥
-        #targeting: *emptyTargeting
+        targeting: *emptyTargeting
         #targeting: *languageTargeting
         #targeting: *osTargeting
-        targeting: *randomTargeting
+        #targeting: *randomTargeting
         #targeting: *timedTargeting
         #targeting: *connectionTargeting
