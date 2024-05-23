@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: fib-service
-          image: ghcr.io/open-feature/playground-fib-service:v0.15.2
+          image: ghcr.io/open-feature/playground-fib-service:v0.16.0
           args:
             - flagd
           ports:
@@ -86,4 +86,9 @@ data:
   OTEL_SERVICE_NAME: "fibonacci-service"
   FIB_SERVICE_USER: ""
   FIB_SERVICE_PASS: ""
+  FLAGD_HOST: "localhost"
+  FLAGD_PORT: "8013"
+  FLAGD_TLS: "false"
+  GO_FEATURE_FLAG_URL: "http://open-feature-demo-goff-service.open-feature-demo.svc.cluster.local:1031"
+  FLIPT_URL: "http://open-feature-demo-flipt-service.open-feature-demo.svc.cluster.local:8080"
   NODE_ENV: "production"
