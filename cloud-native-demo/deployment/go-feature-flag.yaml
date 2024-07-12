@@ -99,7 +99,7 @@ data:
       default: recursive
       percentage: 100
       rule: email ew "@faas.com"
-    goff-example-flag:
+    example-flag:
       true: true
       false: false
       default: true

@@ -45,6 +45,12 @@ spec:
                     - email
             - yellow
             - null
+      example-flag:
+        state: ENABLED
+        variants:
+          'on': true
+          'off': false
+        defaultVariant: 'on'
 ---
 apiVersion: core.openfeature.dev/v1beta1
 kind: FeatureFlag
