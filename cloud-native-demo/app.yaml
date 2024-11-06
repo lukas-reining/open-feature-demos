@@ -1,20 +1,65 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: openfeature-demo
+  name: open-feature-demo
   namespace: argocd
 spec:
   destination:
     namespace: open-feature-demo
     server: https://kubernetes.default.svc
   project: default
-  source:
-    path: cloud-native-demo/deployment
-    repoURL: {{GITOPS_REPO}}
-    targetRevision: HEAD
+  sources:
+    - repoURL: https://helm.flipt.io
+      chart: flipt
+      targetRevision: 0.72.1
+      helm:
+        valuesObject:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+          persistence:
+            enabled: true
+          flipt:
+            extraEnvVars:
+              - name: FLIPT_CORS_ENABLED
+                value: "true"
+              - name: FLIPT_TRACING_ENABLED
+                value: "true"
+              - name: FLIPT_TRACING_EXPORTER
+                value: "otlp"
+              - name: FLIPT_TRACING_OTLP_ENDPOINT
+                value: "http://open-feature-demo-otel-collector.open-feature-demo.svc.cluster.local:4317"
+            config:
+              cors:
+                enabled: true
+              # authentication:
+              #   required: true
+              #   exclude:
+              #     evaluation: true
+              #     OFREP: true
+              #   session:
+              #     domain: ${FLIPT_HOST}
+              #   methods:
+              #     oidc:
+              #       enabled: true
+              #       providers:
+              #         Rosennxt:
+              #           issuer_url: "https://login.microsoftonline.com/ff126ac9-146d-44a5-92e2-dcd1bf29806f/v2.0"
+              #           redirect_address: ${FLIPT_BASE_URL}
+              #           client_id: "ece0b6eb-4a0b-4605-8169-face14c4ee05"
+              #           client_secret: ${FLIPT_CLIENT_SECRET}
+              #           use_pkce: true
+    - path: cloud-native-demo/deployment
+      repoURL: {{GITOPS_REPO}}
+      targetRevision: HEAD
+
   syncPolicy:
-    # automated:
-    #   selfHeal: true
-    #   prune: true
+    automated:
+      selfHeal: true
+      prune: true
     syncOptions:
       - CreateNamespace=true

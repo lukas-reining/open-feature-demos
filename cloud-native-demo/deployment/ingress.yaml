@@ -135,11 +135,10 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: open-feature-demo-flipt-service
+                name: open-feature-demo-flipt
                 port:
                   number: 8080
   tls:
     - hosts:
         - flipt.of-cloud-native.reining.dev
       secretName: of-demo-server-flipt-tls
----
