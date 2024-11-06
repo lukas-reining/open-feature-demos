@@ -90,5 +90,5 @@ data:
   FLAGD_PORT: "8013"
   FLAGD_TLS: "false"
   GO_FEATURE_FLAG_URL: "http://open-feature-demo-goff-service.open-feature-demo.svc.cluster.local:1031"
-  FLIPT_URL: "http://open-feature-demo-flipt-service.open-feature-demo.svc.cluster.local:8080"
+  FLIPT_URL: "http://open-feature-demo-flipt.open-feature-demo.svc.cluster.local:8080"
   NODE_ENV: "production"

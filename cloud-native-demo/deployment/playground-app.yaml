@@ -110,7 +110,7 @@ data:
   FLAGD_OFREP_PORT_WEB: "443"
   GO_FEATURE_FLAG_URL: "http://open-feature-demo-goff-service.open-feature-demo.svc.cluster.local:1031"
   GO_FEATURE_FLAG_WEB_URL: "https://goff.of-cloud-native.reining.dev"
-  FLIPT_URL: "http://open-feature-demo-flipt-service.open-feature-demo.svc.cluster.local:8080"
+  FLIPT_URL: "http://open-feature-demo-flipt.open-feature-demo.svc.cluster.local:8080"
   FLIPT_WEB_URL: "https://flipt.of-cloud-native.reining.dev"
   NODE_ENV: "production"
   # OTEL_LOG_LEVEL: "DEBUG"
