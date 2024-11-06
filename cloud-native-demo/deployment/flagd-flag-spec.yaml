@@ -68,25 +68,25 @@ spec:
           binet: binet
         defaultVariant: recursive
         state: ENABLED
-        # targeting:
-        #   if:
-        #     - in:
-        #         - "@faas.com"
-        #         - var:
-        #             - email
-        #     - binet
-        #     - null
-      use-remote-fib-service:
-        state: ENABLED
-        variants:
-          'on': true
-          'off': false
-        defaultVariant: 'off'
         targeting:
           if:
             - in:
                 - "@faas.com"
                 - var:
                     - email
-            - "on"
-            - "off"
+            - binet
+            - null
+      use-remote-fib-service:
+        state: ENABLED
+        variants:
+          'on': true
+          'off': false
+        defaultVariant: 'off'
+        # targeting:
+        #   if:
+        #     - in:
+        #         - "@faas.com"
+        #         - var:
+        #             - email
+        #     - "on"
+        #     - "off"
