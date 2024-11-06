@@ -35,7 +35,7 @@ spec:
           green: 2f5230
           blue: 0d507b
           yellow: d4ac0d
-        defaultVariant: red
+        defaultVariant: blue
         state: ENABLED
         targeting:
           if:
