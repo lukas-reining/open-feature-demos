@@ -1,0 +1,68 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: toggle-shop-otel
+spec:
+  image: jaegertracing/jaeger:2.3.0
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: "0.0.0.0:4317"
+          http:
+            endpoint: "0.0.0.0:4318"
+    exporters:
+      prometheus:
+        endpoint: "0.0.0.0:8889"
+      jaeger_storage_exporter:
+        trace_storage: in_memory
+      debug: {}
+    extensions:
+      jaeger_query:
+        storage:
+          traces: in_memory
+      jaeger_storage:
+        backends:
+          in_memory:
+            memory:
+              max_traces: 100000
+      healthcheckv2:
+        use_v2: true
+        http:
+          endpoint: "localhost:13133"
+          status:
+            enabled: true
+            path: "/health/status"
+    service:
+      extensions: [jaeger_storage, jaeger_query, healthcheckv2]
+      telemetry:
+        logs:
+          level: "debug"
+      pipelines:
+        traces:
+          receivers: [ otlp ]
+          exporters: [ jaeger_storage_exporter ]
+        logs:
+          receivers: [ otlp ]
+          exporters: [ debug ]
+        metrics:
+          receivers: [ otlp ]
+          exporters: [ prometheus ]
+  managementState: managed
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jaeger-toggle-shop
+spec:
+  parentRefs:
+    - name: default-envoy-gateway
+      namespace: envoy-gateway-system
+  hostnames:
+    - jaeger-toggle-shop.reining.dev
+  rules:
+    - backendRefs:
+        - kind: Service
+          name: toggle-shop-otel-collector-extension
+          port: 16686

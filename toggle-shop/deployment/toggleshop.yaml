@@ -35,6 +35,12 @@ spec:
           env:
             - name: FLAGD_HOST
               value: flagd-in-process
+            - name: OTLP_TRACE_URL
+              value: http://toggle-shop-otel-collector.toggle-shop.svc.cluster.local:4317
+            - name: OTLP_METRICS_URL
+              value: http://toggle-shop-otel-collector.toggle-shop.svc.cluster.local:4317
+            - name: OTLP_LOGS_URLs
+              value: http://toggle-shop-otel-collector.toggle-shop.svc.cluster.local:4317
 ---
 # Service to expose our application
 apiVersion: v1
@@ -67,3 +73,41 @@ spec:
         - kind: Service
           name: toggle-shop-app-service
           port: 3000
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+    - backendRefs:
+        - group: ""
+          kind: Service
+          name: flagd-ui
+          namespace: open-feature-toggle-shop
+          port: 8016
+          weight: 1
+      matches:
+        - path:
+            type: PathPrefix
+            value: /api/ofrep
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /ofrep
+    - backendRefs:
+        - group: ""
+          kind: Service
+          name: flagd-ui
+          namespace: open-feature-toggle-shop
+          port: 8013
+          weight: 1
+      matches:
+        - path:
+            type: PathPrefix
+            value: /api/flagd.evaluation.v1.Service
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /flagd.evaluation.v1.Service

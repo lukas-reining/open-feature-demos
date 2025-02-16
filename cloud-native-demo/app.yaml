@@ -16,7 +16,7 @@ spec:
         valuesObject:
           resources:
             requests:
-              cpu: 50m
+              cpu: 10m
               memory: 128Mi
             limits:
               cpu: 100m

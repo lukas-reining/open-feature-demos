@@ -7,8 +7,12 @@ spec:
   replicas: 1
   serviceAccountName: default
   featureFlagSource: ui-flag-source
+  ingress:
+    enabled: false
+    hosts: []
   gatewayApiRoutes:
-    enabled: true
+    # We use a /api prefix so we have to create the domain ourselves
+    enabled: false
     parentRefs:
       - name: default-envoy-gateway
         namespace: envoy-gateway-system
