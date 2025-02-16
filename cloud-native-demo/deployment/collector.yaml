@@ -42,10 +42,8 @@ spec:
       pipelines:
         traces:
           receivers: [ otlp ]
-          processors: [ ]
           exporters: [ jaeger_storage_exporter ]
         metrics:
           receivers: [ otlp ]
-          processors: [ ]
           exporters: [ prometheus ]
   managementState: managed

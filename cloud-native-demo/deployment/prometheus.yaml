@@ -68,4 +68,3 @@ data:
 
         static_configs:
           - targets: [ 'open-feature-demo-otel-collector-service.open-feature-demo.svc.cluster.local:8889' ]
-          - targets: [ 'open-feature-demo-otel-collector-service.open-feature-demo.svc.cluster.local:8888' ]
