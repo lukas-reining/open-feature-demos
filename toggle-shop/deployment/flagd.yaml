@@ -1,0 +1,51 @@
+# Standalone flagd for serving UI
+apiVersion: core.openfeature.dev/v1beta1
+kind: Flagd
+metadata:
+  name: flagd-ui
+spec:
+  replicas: 1
+  serviceAccountName: default
+  featureFlagSource: ui-flag-source
+  gatewayApiRoutes:
+    enabled: true
+    parentRefs:
+      - name: default-envoy-gateway
+        namespace: envoy-gateway-system
+    hosts:
+      - toggle-shop.reining.dev
+---
+# Standalone flagd for serving in-process provider
+apiVersion: core.openfeature.dev/v1beta1
+kind: Flagd
+metadata:
+  name: flagd-in-process
+spec:
+  replicas: 1
+  serviceType: ClusterIP
+  serviceAccountName: default
+  featureFlagSource: app-flag-source
+---
+# Feature flag source custom resource, configuring flagd to source flags from FeatureFlag CRDs
+apiVersion: core.openfeature.dev/v1beta1
+kind: FeatureFlagSource
+metadata:
+  name: ui-flag-source
+  labels:
+    app: toggle-shop
+spec:
+  sources:
+    - source: ui-flags
+      provider: kubernetes
+---
+# Feature flag source custom resource, configuring flagd to source flags from FeatureFlag CRDs
+apiVersion: core.openfeature.dev/v1beta1
+kind: FeatureFlagSource
+metadata:
+  name: app-flag-source
+  labels:
+    app: toggle-shop
+spec:
+  sources:
+    - source: app-flags
+      provider: kubernetes

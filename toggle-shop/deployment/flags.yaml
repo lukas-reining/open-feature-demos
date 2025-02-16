@@ -1,0 +1,52 @@
+# Flags for our UI
+apiVersion: core.openfeature.dev/v1beta1
+kind: FeatureFlag
+metadata:
+  name: ui-flags
+  labels:
+    app: toggle-shop
+spec:
+  flagSpec:
+    flags:
+      offer-free-shipping:
+        state: ENABLED
+        variants:
+          'on': true
+          'off': false
+        defaultVariant: 'on'
+      sticky-header:
+        state: ENABLED
+        variants:
+          'on': true
+          'off': false
+        defaultVariant: 'off'
+        # targeting:
+        #   if:
+        #     - "==":
+        #       - var: size
+        #       - sm
+        #     - 'on'
+        #     -
+---
+# Flags for our backend application
+apiVersion: core.openfeature.dev/v1beta1
+kind: FeatureFlag
+metadata:
+  name: app-flags
+  labels:
+    app: toggle-shop
+spec:
+  flagSpec:
+    flags:
+      use-distributed-db:
+        state: ENABLED
+        variants:
+          'on': true
+          'off': false
+        defaultVariant: 'off'
+      use-secure-protocol:
+        state: ENABLED
+        variants:
+          'on': true
+          'off': false
+        defaultVariant: 'off'

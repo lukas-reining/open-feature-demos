@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: open-feature-toggle-shop
+  namespace: argocd
+spec:
+  destination:
+    namespace: open-feature-toggle-shop
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: toggle-shop/deployment
+    repoURL: {{GITOPS_REPO}}
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
