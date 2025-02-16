@@ -1,144 +1,87 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: playground-ingress
+  name: playground-flagd-grpc
   namespace: open-feature-demo
-  annotations:
-    cert-manager.io/cluster-issuer: reining-dev-prod-issuer
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://of-cloud-native.reining.dev, https://*.of-cloud-native.reining.dev"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Connect-Protocol-Version"
 spec:
-  ingressClassName: nginx
+  hostnames:
+    - flagd.of-cloud-native.reining.dev
+  parentRefs:
+    - name: default-envoy-gateway
+      namespace: envoy-gateway-system
   rules:
-    - host: of-cloud-native.reining.dev
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: open-feature-demo-service
-                port:
-                  number: 80
-  tls:
-    - hosts:
-        - of-cloud-native.reining.dev
-      secretName: of-demo-server-tls
+    - backendRefs:
+        - name: flagd-grpc-service
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /flagd.evaluation.v1.Service
+      timeouts:
+        request: "0s"
+    - backendRefs:
+        - name: flagd-ofrep-service
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /ofrep
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: playground-flagd-ingress
+  name: playground-flipt
   namespace: open-feature-demo
-  annotations:
-    cert-manager.io/cluster-issuer: reining-dev-prod-issuer
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://of-cloud-native.reining.dev, https://*.of-cloud-native.reining.dev"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Connect-Protocol-Version"
 spec:
-  ingressClassName: nginx
+  hostnames:
+    - flipt.of-cloud-native.reining.dev
+  parentRefs:
+    - name: default-envoy-gateway
+      namespace: envoy-gateway-system
   rules:
-    - host: flagd.of-cloud-native.reining.dev
-      http:
-        paths:
-          - path: /ofrep
-            pathType: Prefix
-            backend:
-              service:
-                name: flagd-ofrep-service
-                port:
-                  number: 80
-  tls:
-    - hosts:
-        - flagd.of-cloud-native.reining.dev
-      secretName: of-demo-server-flagd-tls
+    - backendRefs:
+        - name: open-feature-demo-flipt
+          port: 8080
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: playground-flagd-grpc-ingress
+  name: playground-goff
   namespace: open-feature-demo
-  annotations:
-    cert-manager.io/cluster-issuer: reining-dev-prod-issuer
-    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://of-cloud-native.reining.dev, https://*.of-cloud-native.reining.dev"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Connect-Protocol-Version"
 spec:
-  ingressClassName: nginx
+  hostnames:
+    - goff.of-cloud-native.reining.dev
+  parentRefs:
+    - name: nginx
   rules:
-    - host: flagd.of-cloud-native.reining.dev
-      http:
-        paths:
-          - path: /flagd.evaluation.v1.Service
-            pathType: Prefix
-            backend:
-              service:
-                name: flagd-grpc-service
-                port:
-                  number: 80
-  tls:
-    - hosts:
-        - flagd.of-cloud-native.reining.dev
-      secretName: of-demo-server-flagd-tls
+    - backendRefs:
+        - name: open-feature-demo-goff-service
+          port: 1031
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: playground-goff-ingress
+  name: playground
   namespace: open-feature-demo
-  annotations:
-    cert-manager.io/cluster-issuer: reining-dev-prod-issuer
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://of-cloud-native.reining.dev, https://*.of-cloud-native.reining.dev"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Connect-Protocol-Version"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
 spec:
-  ingressClassName: nginx
+  hostnames:
+    - of-cloud-native.reining.dev
+  parentRefs:
+    - name: default-envoy-gateway
+      namespace: envoy-gateway-system
   rules:
-    - host: goff.of-cloud-native.reining.dev
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: open-feature-demo-goff-service
-                port:
-                  number: 1031
-  tls:
-    - hosts:
-        - goff.of-cloud-native.reining.dev
-      secretName: of-demo-server-goff-tls
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: playground-flipt-ingress
-  namespace: open-feature-demo
-  annotations:
-    cert-manager.io/cluster-issuer: reining-dev-prod-issuer
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://of-cloud-native.reining.dev, https://*.of-cloud-native.reining.dev"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Connect-Protocol-Version"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-spec:
-  ingressClassName: nginx
-  rules:
-    - host: flipt.of-cloud-native.reining.dev
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: open-feature-demo-flipt
-                port:
-                  number: 8080
-  tls:
-    - hosts:
-        - flipt.of-cloud-native.reining.dev
-      secretName: of-demo-server-flipt-tls
+    - backendRefs:
+        - name: open-feature-demo-service
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /

@@ -36,27 +36,9 @@ spec:
             config:
               cors:
                 enabled: true
-              # authentication:
-              #   required: true
-              #   exclude:
-              #     evaluation: true
-              #     OFREP: true
-              #   session:
-              #     domain: ${FLIPT_HOST}
-              #   methods:
-              #     oidc:
-              #       enabled: true
-              #       providers:
-              #         Rosennxt:
-              #           issuer_url: "https://login.microsoftonline.com/ff126ac9-146d-44a5-92e2-dcd1bf29806f/v2.0"
-              #           redirect_address: ${FLIPT_BASE_URL}
-              #           client_id: "ece0b6eb-4a0b-4605-8169-face14c4ee05"
-              #           client_secret: ${FLIPT_CLIENT_SECRET}
-              #           use_pkce: true
     - path: cloud-native-demo/deployment
       repoURL: {{GITOPS_REPO}}
       targetRevision: HEAD
-
   syncPolicy:
     automated:
       selfHeal: true
